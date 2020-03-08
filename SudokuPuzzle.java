@@ -30,13 +30,13 @@ public class SudokuPuzzle extends JFrame
 	public static void main(String[] args) {
 		int difficulty = 10;
 		System.out.println("Input a difficulty 1 - 10:");
-		System.out.println("10 = Easy, 1 = Hard");
+		System.out.println("1 = Easy, 10 = Hard");
 		puzzleBuilder puzzle = new puzzleBuilder(difficulty);
-		int[][] ThePuzzle = puzzle.build();
-		SudokuSolver solver = new SudokuSolver(ThePuzzle);
-		puzzle.printer();
-		solver.solver();
-		solver.solutionPrinter();
+		//int[][] ThePuzzle = puzzle.build();
+		//SudokuSolver solver = new SudokuSolver(ThePuzzle);
+		//puzzle.printer();
+		//solver.solver();
+		//solver.solutionPrinter();
 		
 
 	}

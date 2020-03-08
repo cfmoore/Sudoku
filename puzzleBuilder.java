@@ -9,8 +9,11 @@ import java.util.Random;
 public class puzzleBuilder 
 {
 	private Random rand = new Random();// Random Number Generator
-	private int difficulty;//Initizalize the difficulty
+	private int difficulty;//Initialize the difficulty
 	public int[][] puzzle = new int[9][9];// Initialize a blank sudoku board
+	private boolean firstRow = true;//Used to build first row as random numbers
+	private boolean doneFlag = false;//So recursion doesnt continue to produce different boards
+	public int[][]finalPuzzle = new int[9][9];//The final puzzle that starts as solved
 	
 	/**
 	 * Gets the difficulty of the board
@@ -36,22 +39,87 @@ public class puzzleBuilder
 	 */
 	public puzzleBuilder(int difficulty)
 	{
-		if(difficulty<=1)
-			this.setDifficulty(1);
+		if(difficulty<=3)
+			this.setDifficulty(3);
+		else if (difficulty >= 10)
+			this.setDifficulty(10);
 		else
-			this.setDifficulty(difficulty-1);
+			this.setDifficulty(difficulty);
 	}
 	
 	/**
-	 *Builds the 2d array puzzle using random integers
-	 *and backtracking 
+	 *Builds the first row using random integers
+	 *Possible combinations = 9! = 362880 just for first row
 	 * @return a completed sudoku puzzle
 	 */
-	public int[][] build()
+	private void buildFirstRow()
 	{
-		System.out.println("BUILDING");
 		boolean notPossible = true;
-		int tryLimit = 0;
+		int number = 0;
+		for(int start = 0; start < puzzle.length; start ++)
+		{
+			//Keep trying until a number is there
+			while(puzzle[0][start] == 0)
+			{
+				number = rand.nextInt(10);
+				notPossible = startRow(number);
+				if(notPossible)
+				{
+					puzzle[0][start]=number;
+							break;
+				}
+			}
+			
+		}
+	}
+	
+	/**
+	 * Checks to make sure there are no duplicates in the first row
+	 * @param number the number to be inserted into the puzzle
+	 * @return either true the number can go there or false;
+	 */
+	public boolean startRow(int number)
+	{
+		for(int i = 0; i < puzzle.length; i++)
+			if(number == puzzle[0][i])
+				return false;
+		return true;
+			
+	}
+	
+	/**
+	 * Solidify the completed puzzle
+	 * Due to backtracking, all progress is erased when the loop exits
+	 * Then fill in 0's for the actual puzzle based on difficulty
+	 * @param completedPuzzle the puzzle that was finished via the back tracking
+	 */
+	private void buildFinalPuzzle(int[][] completedPuzzle)
+	{
+		int randomInt = 0;
+		for(int y = 0; y<finalPuzzle.length; y++)
+		{
+			for(int x = 0; x<finalPuzzle.length; x++)
+			{
+				randomInt = rand.nextInt(getDifficulty());
+				if((randomInt/2) == 1 || randomInt ==1)
+					finalPuzzle[y][x] = completedPuzzle[y][x];
+			}
+		}
+	}
+	
+	/**
+	 * Main Driver of the builder
+	 * Uses recursion and backtracking to solve the puzzle to make sure puzzle is possible
+	 */
+	public void build()
+	{
+		//If puzzle becomes complete, stop recursion calls
+		if(doneFlag)
+			return;
+		//Needs to buid the first row 
+		if(firstRow)
+			buildFirstRow();
+		firstRow = false;
 		for(int y = 0; y<puzzle.length; y++)
 		{
 			for(int x = 0; x<puzzle.length; x++)
@@ -62,21 +130,20 @@ public class puzzleBuilder
 					{
 						if(checkPuzzle(y,x,solution))
 						{
-							grid[y][x] = solution;
-							solver();
-							grid[y][x] = 0;
+							puzzle[y][x] = solution;
+							if(y==8 & x == 8)
+								buildFinalPuzzle(puzzle);
+							build();
+							puzzle[y][x] = 0;
 							
 						}
 					}
 					return;
+				}
 			}
 		}
-		
-		
-		return puzzle;
+		doneFlag = true;
 	}
-	
-
 	
 	/**
 	 * Checks to see if the puzzle is an actual solvable puzzle
@@ -84,12 +151,12 @@ public class puzzleBuilder
 	 * @param x the row to be cheked
 	 * @return return true if the puzzle is unsolvable
 	 */
-	private boolean checkPuzzle(int y, int x)
+	private boolean checkPuzzle(int y, int x, int number)
 	{
 		for(int i = 0; i <puzzle.length; i++)
-			if(puzzle[y][x] == puzzle[y][i] && i != x) return true;
+			if(number == puzzle[y][i] && i != x) return false;
 		for(int i = 0; i<puzzle.length; i++)
-			if(puzzle[y][x] == puzzle[i][x] && i != y) return true;
+			if(number == puzzle[i][x] && i != y) return false;
 		//determine square to check
 		int square_x = -1;
 		int square_y = -1;
@@ -105,13 +172,13 @@ public class puzzleBuilder
 		{
 			while(square_x<temp_x+3)
 			{
-				if(puzzle[y][x] == puzzle[square_y][square_x] && square_y != y && square_x != x) return true;
+				if(number == puzzle[square_y][square_x] && square_y != y && square_x != x) return false;
 				square_x++;
 			}
 			square_x = temp_x;
 			square_y++;
 		}
-		return false;
+		return true;
 	}
 	
 	/**
@@ -119,20 +186,20 @@ public class puzzleBuilder
 	 */
 	public void printer()
 	{
-		for(int i = 0; i<puzzle.length; i++)
+		for(int i = 0; i<finalPuzzle.length; i++)
 		{
 			if(i == 0 || i == 3 || i == 6)
 				System.out.print("+ - - - + - - - + - - - +\n");
-			for(int j = 0; j<puzzle.length; j++)
+			for(int j = 0; j<finalPuzzle.length; j++)
 			{
 				if(j == 0)
-					System.out.print("| "+puzzle[i][j]);
+					System.out.print("| "+finalPuzzle[i][j]);
 				else if(j==2 || j == 5)
-					System.out.print(" "+puzzle[i][j]+" |");
+					System.out.print(" "+finalPuzzle[i][j]+" |");
 				else if(j == 8)
-					System.out.print(" "+puzzle[i][j]+" |\n");
+					System.out.print(" "+finalPuzzle[i][j]+" |\n");
 				else
-					System.out.print(" "+puzzle[i][j]);
+					System.out.print(" "+finalPuzzle[i][j]);
 				
 			}
 		}
@@ -140,7 +207,7 @@ public class puzzleBuilder
 		System.out.println();
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		puzzleBuilder pb = new puzzleBuilder(10);
 		pb.build();
 		pb.printer();
