@@ -96,7 +96,8 @@ public class SudokuSolver {
 						if(isPossible(y,x,solution))
 						{
 							grid[y][x] = solution;
-							buildSolution(y,x,solution);
+							if(y==8 && x == 8)
+								buildSolution(y,x,solution);
 							solver();
 							grid[y][x] = 0;
 							

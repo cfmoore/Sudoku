@@ -9,44 +9,11 @@ import java.util.Random;
 public class puzzleBuilder 
 {
 	private Random rand = new Random();// Random Number Generator
-	private int difficulty;//Initialize the difficulty
-	public int[][] puzzle = new int[9][9];// Initialize a blank sudoku board
+	private int[][] puzzle = new int[9][9];// Initialize a blank sudoku board
 	private boolean firstRow = true;//Used to build first row as random numbers
 	private boolean doneFlag = false;//So recursion doesnt continue to produce different boards
 	public int[][]finalPuzzle = new int[9][9];//The final puzzle that starts as solved
-	
-	/**
-	 * Gets the difficulty of the board
-	 * for Java completeness, not used. Dificulty is only
-	 * called and set in the constructotr
-	 * @return the difficulty
-	 */
-	public int getDifficulty() {
-		return difficulty;
-	}
-	
-	/**
-	 * Sets the difficulty for Java completness, not used
-	 * @param difficulty the difficulty of the board
-	 */
-	public void setDifficulty(int difficulty) {
-		this.difficulty = difficulty;
-	}
 
-	/**
-	 * COnstructor to for the puzzle 
-	 * @param difficulty the difficulty of the board
-	 */
-	public puzzleBuilder(int difficulty)
-	{
-		if(difficulty<=3)
-			this.setDifficulty(3);
-		else if (difficulty >= 10)
-			this.setDifficulty(10);
-		else
-			this.setDifficulty(difficulty);
-	}
-	
 	/**
 	 *Builds the first row using random integers
 	 *Possible combinations = 9! = 362880 just for first row
@@ -78,7 +45,7 @@ public class puzzleBuilder
 	 * @param number the number to be inserted into the puzzle
 	 * @return either true the number can go there or false;
 	 */
-	public boolean startRow(int number)
+	private boolean startRow(int number)
 	{
 		for(int i = 0; i < puzzle.length; i++)
 			if(number == puzzle[0][i])
@@ -95,13 +62,10 @@ public class puzzleBuilder
 	 */
 	private void buildFinalPuzzle(int[][] completedPuzzle)
 	{
-		int randomInt = 0;
 		for(int y = 0; y<finalPuzzle.length; y++)
 		{
 			for(int x = 0; x<finalPuzzle.length; x++)
 			{
-				randomInt = rand.nextInt(getDifficulty());
-				if((randomInt/2) == 1 || randomInt ==1)
 					finalPuzzle[y][x] = completedPuzzle[y][x];
 			}
 		}
@@ -207,10 +171,19 @@ public class puzzleBuilder
 		System.out.println();
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
-		puzzleBuilder pb = new puzzleBuilder(10);
+	/**
+	 * Gets the final solved puzzle, stores it in memory since all the hard work has been done
+	 * @return the final solved puzzle
+	 */
+	public int[][] getFinalPuzzle()
+	{
+		return finalPuzzle;
+	}
+	
+	/**public static void main(String[] args) throws InterruptedException {
+		puzzleBuilder pb = new puzzleBuilder();
 		pb.build();
 		pb.printer();
-	}
+	}*/
 
 }
