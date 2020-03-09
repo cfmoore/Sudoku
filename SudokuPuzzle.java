@@ -10,6 +10,10 @@ import javax.swing.*;
 
 public class SudokuPuzzle extends JFrame 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final int GRID_SIZE = 9;//size of board grid 9X9
 	public static final int SUBGRID_SIZE = 3;//size of sub grids 3X3
 	public static final int CELL_SIZE = 60;//size of cell in pixels
@@ -31,13 +35,12 @@ public class SudokuPuzzle extends JFrame
 		int difficulty = 10;
 		System.out.println("Input a difficulty 1 - 10:");
 		System.out.println("1 = Easy, 10 = Hard");
-		puzzleBuilder puzzle = new puzzleBuilder(difficulty);
-		//int[][] ThePuzzle = puzzle.build();
-		//SudokuSolver solver = new SudokuSolver(ThePuzzle);
-		//puzzle.printer();
-		//solver.solver();
-		//solver.solutionPrinter();
-		
+		puzzleBuilder puzzle = new puzzleBuilder();
+		puzzle.build();
+		int[][] thePuzzle = puzzle.getFinalPuzzle();
+		SolvableSudoku playPuzzle = new SolvableSudoku(difficulty);
+		playPuzzle.buildPuzzle(thePuzzle);
+		playPuzzle.printer();
 
 	}
 
